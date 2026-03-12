@@ -230,6 +230,38 @@
       font-weight: 500;
     }
 
+    /* ── 포스트 카드 ── */
+    .post-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .post-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 22px;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: border-color .2s, transform .2s;
+    }
+
+    .post-card:hover {
+      border-color: var(--accent2);
+      transform: translateX(4px);
+    }
+
+    .post-card-title { font-size: 1rem; font-weight: 600; }
+    .post-card-meta { font-size: 0.8rem; color: var(--muted); }
+    .post-card-desc { font-size: 0.88rem; color: var(--muted); }
+
+    .no-posts { color: var(--muted); font-size: 0.9rem; margin-bottom: 40px; }
+
     /* ── 푸터 ── */
     footer {
       text-align: center;
@@ -273,6 +305,10 @@
     <!-- 태스크 -->
     <p class="section-title">학습 목록</p>
     <div class="task-list" id="task-list"></div>
+
+    <!-- 블로그 -->
+    <p class="section-title">📝 학습 기록</p>
+    <div id="post-list" class="post-grid"></div>
 
     <!-- 태그 -->
     <div class="tags">
@@ -323,6 +359,25 @@
     }
 
     renderTasks();
+
+    // ── 포스트 목록 ──────────────────────────
+    fetch('/posts.json')
+      .then(r => r.ok ? r.json() : [])
+      .then(posts => {
+        const el = document.getElementById('post-list');
+        if (!posts.length) {
+          el.innerHTML = '<p class="no-posts">아직 작성된 글이 없어요. <a href="/admin" style="color:var(--accent2)">글 쓰러 가기 →</a></p>';
+          return;
+        }
+        el.innerHTML = posts.map(p => `
+          <a class="post-card" href="/post.html?slug=${p.slug}">
+            <span class="post-card-title">${p.title}</span>
+            ${p.description ? `<span class="post-card-desc">${p.description}</span>` : ''}
+            <span class="post-card-meta">${p.date ? new Date(p.date).toLocaleDateString('ko-KR') : ''}</span>
+          </a>
+        `).join('');
+      })
+      .catch(() => {});
 
     // ── 배경 신경망 애니메이션 ─────────────────
     (function () {

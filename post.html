@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post · PyTorch Study</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --bg: #0d1117; --surface: #161b22; --border: #30363d;
+      --accent2: #f97316; --text: #e6edf3; --muted: #8b949e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; }
+    .wrapper { max-width: 740px; margin: 0 auto; padding: 60px 24px 80px; }
+    .back { color: var(--accent2); text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 40px; }
+    .back:hover { text-decoration: underline; }
+    .post-date { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; }
+    h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+    .content { line-height: 1.8; font-size: 1rem; }
+    .content h1,.content h2,.content h3 { margin: 2em 0 .6em; }
+    .content h2 { font-size: 1.4rem; color: var(--accent2); }
+    .content h3 { font-size: 1.15rem; }
+    .content p { margin-bottom: 1.2em; }
+    .content code { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; font-size: 0.88em; font-family: 'Fira Code', monospace; }
+    .content pre { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; overflow-x: auto; margin-bottom: 1.2em; }
+    .content pre code { background: none; border: none; padding: 0; }
+    .content ul, .content ol { padding-left: 1.5em; margin-bottom: 1.2em; }
+    .content li { margin-bottom: .4em; }
+    .content blockquote { border-left: 3px solid var(--accent2); padding-left: 16px; color: var(--muted); margin: 1.2em 0; }
+    .content a { color: var(--accent2); }
+    #loading { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <a class="back" href="/">← 홈으로</a>
+    <div id="loading">불러오는 중...</div>
+    <article id="post" style="display:none">
+      <p class="post-date" id="post-date"></p>
+      <h1 id="post-title"></h1>
+      <hr class="divider" />
+      <div class="content" id="post-body"></div>
+    </article>
+  </div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const slug = params.get('slug');
+
+    if (!slug) { location.href = '/'; }
+
+    fetch(`/posts/${slug}.md`)
+      .then(r => { if (!r.ok) throw new Error(); return r.text(); })
+      .then(text => {
+        const fmMatch = text.match(/^---\n([\s\S]*?)\n---/);
+        const data = {};
+        if (fmMatch) {
+          fmMatch[1].split('\n').forEach(line => {
+            const [k, ...v] = line.split(':');
+            if (k && v.length) data[k.trim()] = v.join(':').trim().replace(/^["']|["']$/g, '');
+          });
+        }
+        const body = fmMatch ? text.slice(fmMatch[0].length).trim() : text;
+
+        document.title = (data.title || slug) + ' · PyTorch Study';
+        document.getElementById('post-title').textContent = data.title || slug;
+        document.getElementById('post-date').textContent = data.date ? new Date(data.date).toLocaleDateString('ko-KR') : '';
+        document.getElementById('post-body').innerHTML = marked.parse(body);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('post').style.display = 'block';
+      })
+      .catch(() => {
+        document.getElementById('loading').textContent = '글을 찾을 수 없습니다.';
+      });
+  </script>
+</body>
+</html>
