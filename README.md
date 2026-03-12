@@ -2,7 +2,6 @@
 
 > A 2-person PyTorch study group — we pick content each week, study independently, and share summaries.
 
-**Members:** `KKM` · `AAA`
 
 ---
 
