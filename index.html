@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PyTorch Study</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --accent: #ee4d2d;
+      --accent2: #f97316;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --done: #3fb950;
+      --todo: #f85149;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── 배경 캔버스 ── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    /* ── 헤더 ── */
+    header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff 30%, var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-top: 8px;
+    }
+
+    /* ── 진행률 카드 ── */
+    .progress-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .progress-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .progress-pct {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent2);
+    }
+
+    .progress-bar {
+      background: var(--border);
+      border-radius: 999px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 1s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── 태스크 목록 ── */
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 16px;
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .task {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: border-color .2s, transform .2s;
+      cursor: default;
+    }
+
+    .task:hover {
+      border-color: var(--accent2);
+      transform: translateX(4px);
+    }
+
+    .task-status {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .task-status.done {
+      background: rgba(63, 185, 80, 0.15);
+      border: 2px solid var(--done);
+      color: var(--done);
+    }
+
+    .task-status.todo {
+      background: rgba(248, 81, 73, 0.1);
+      border: 2px dashed var(--border);
+      color: var(--muted);
+    }
+
+    .task-label {
+      font-size: 1rem;
+      flex: 1;
+    }
+
+    .task.done-item .task-label {
+      color: var(--done);
+    }
+
+    .task.todo-item .task-label {
+      color: var(--text);
+    }
+
+    .task-badge {
+      font-size: 0.72rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .task.done-item .task-badge {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--done);
+    }
+
+    .task.todo-item .task-badge {
+      background: rgba(248, 81, 73, 0.1);
+      color: var(--todo);
+    }
+
+    /* ── 태그 ── */
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 40px;
+    }
+
+    .tag {
+      background: rgba(249, 115, 22, 0.1);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      color: var(--accent2);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    /* ── 푸터 ── */
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+      border-top: 1px solid var(--border);
+      padding-top: 32px;
+    }
+
+    footer a {
+      color: var(--accent2);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="wrapper">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">🔥</div>
+        <h1>PyTorch Study</h1>
+      </div>
+      <p class="subtitle">딥러닝 공부 기록 · Deep Learning from scratch</p>
+    </header>
+
+    <!-- 진행률 -->
+    <div class="progress-card">
+      <div class="progress-header">
+        <span class="progress-title">전체 진행률</span>
+        <span class="progress-pct" id="pct-text">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- 태스크 -->
+    <p class="section-title">학습 목록</p>
+    <div class="task-list" id="task-list"></div>
+
+    <!-- 태그 -->
+    <div class="tags">
+      <span class="tag">#PyTorch</span>
+      <span class="tag">#DeepLearning</span>
+      <span class="tag">#MachineLearning</span>
+      <span class="tag">#Python</span>
+      <span class="tag">#NeuralNetwork</span>
+    </div>
+
+    <footer>
+      <p>Built with ❤️ for learning &nbsp;·&nbsp;
+        <a href="https://github.com/BokJaeSung/pytorch-study" target="_blank">GitHub</a>
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    // ── 태스크 데이터 ──────────────────────────
+    const tasks = [
+      { label: 'PyTorch 문서 읽기', done: false },
+      { label: '인공지능 개념 숙지', done: false },
+    ];
+
+    // ── 태스크 렌더링 ──────────────────────────
+    function renderTasks() {
+      const list = document.getElementById('task-list');
+      list.innerHTML = '';
+      tasks.forEach(t => {
+        const el = document.createElement('div');
+        el.className = `task ${t.done ? 'done-item' : 'todo-item'}`;
+        el.innerHTML = `
+          <div class="task-status ${t.done ? 'done' : 'todo'}">
+            ${t.done ? '✓' : '○'}
+          </div>
+          <span class="task-label">${t.label}</span>
+          <span class="task-badge">${t.done ? 'Done' : 'Todo'}</span>
+        `;
+        list.appendChild(el);
+      });
+
+      const done = tasks.filter(t => t.done).length;
+      const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+      document.getElementById('pct-text').textContent = pct + '%';
+      setTimeout(() => {
+        document.getElementById('progress-fill').style.width = pct + '%';
+      }, 100);
+    }
+
+    renderTasks();
+
+    // ── 배경 신경망 애니메이션 ─────────────────
+    (function () {
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H, nodes, anim;
+
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+
+      function mkNodes(n) {
+        return Array.from({ length: n }, () => ({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          vx: (Math.random() - .5) * .4,
+          vy: (Math.random() - .5) * .4,
+          r: Math.random() * 2 + 1.5,
+        }));
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        const DIST = 140;
+
+        for (let i = 0; i < nodes.length; i++) {
+          const a = nodes[i];
+          for (let j = i + 1; j < nodes.length; j++) {
+            const b = nodes[j];
+            const dx = a.x - b.x, dy = a.y - b.y;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d < DIST) {
+              ctx.strokeStyle = `rgba(249,115,22,${1 - d / DIST})`;
+              ctx.lineWidth = 0.6;
+              ctx.beginPath();
+              ctx.moveTo(a.x, a.y);
+              ctx.lineTo(b.x, b.y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        nodes.forEach(n => {
+          ctx.fillStyle = 'rgba(249,115,22,0.9)';
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+          ctx.fill();
+
+          n.x += n.vx;
+          n.y += n.vy;
+          if (n.x < 0 || n.x > W) n.vx *= -1;
+          if (n.y < 0 || n.y > H) n.vy *= -1;
+        });
+
+        anim = requestAnimationFrame(draw);
+      }
+
+      resize();
+      nodes = mkNodes(55);
+      draw();
+      window.addEventListener('resize', () => { resize(); nodes = mkNodes(55); });
+    })();
+  </script>
+</body>
+</html>
