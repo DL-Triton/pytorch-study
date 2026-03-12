@@ -10,18 +10,17 @@
 
 | Week | Date | Contents |
 |------|------|----------|
-| [Week 1](#week-1--2026-03-12) | 2026-03-12 | Tensors, Autograd |
+| [Week 1](#week-1--2026-03-13) | 2026-03-13 | 3b1b - Neural Networks Series |
 
 ---
 
 ## 📚 Study Log
 
-### Week 1 · 2026-03-12
+### Week 1 · 2026-03-13
 
 | Content | Duration | Summary |
 |---------|----------|---------|
-| [PyTorch Official Tutorial - Tensors](https://pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html) | - | Basic tensor operations, differences from NumPy, and GPU usage |
-| [PyTorch Official Tutorial - Autograd](https://pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html) | 32:15 | Automatic differentiation for backprop, requires_grad, grad_fn flow |
+| [3b1b - Neural Networks (9-part series)](https://www.youtube.com/watch?v=aircAruvnKk&list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi) | - | 시청 후 각 영상별 요약 작성 예정 |
 
 ---
 
