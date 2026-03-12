@@ -1,5 +1,24 @@
-# pytorch-study
-| 해야 할 일 | 진행 상태 |
-|-----------|------------|
-| PyTorch 문서 읽기 | X |
-| 인공지능 개념 숙지 | X |
+# 🔥 PyTorch Study
+
+> A 2-person PyTorch study group — we pick content each week, study independently, and share summaries.
+
+**Members:** `KKM` · `AAA`
+
+---
+
+## 📚 Study Log
+
+### Week 1 · 2026-03-12
+
+| Content | Summary |
+|---------|---------|
+| [PyTorch Official Tutorial - Tensors](https://pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html) | Basic tensor operations, differences from NumPy, and GPU usage |
+| [PyTorch Official Tutorial - Autograd](https://pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html) | Automatic differentiation for backprop, requires_grad, grad_fn flow |
+
+---
+
+## 🗓️ Up Next
+
+| Content | Link |
+|---------|------|
+| (TBD) | - |
